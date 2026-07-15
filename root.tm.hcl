@@ -24,9 +24,9 @@ generate_hcl "_main.tf" {
 }
 script "plan" {
   description = "plan this leaf"
-  job { commands = [["tofu","init","-input=false"],["tofu","plan","-input=false","-lock=false","-out=stack.otplan"]] }
+  job { commands = [["tofu", "init", "-input=false"], ["tofu", "plan", "-input=false", "-lock=false", "-out=stack.otplan"]] }
 }
 script "apply" {
   description = "apply this leaf"
-  job { commands = [["tofu","init","-input=false"],["tofu","apply","-input=false","-lock=false","-auto-approve","stack.otplan"]] }
+  job { commands = [["tofu", "init", "-input=false"], ["tofu", "apply", "-input=false", "-lock=false", "-auto-approve", "stack.otplan"]] }
 }
