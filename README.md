@@ -49,10 +49,7 @@ waves exactly as in the other layouts.
 - Terramate 0.17.1
 - OpenTofu 1.12.4
 
-Windows/PowerShell PATH and other local-machine notes live in the workspace
-root `README.md`, not here.
-
-## Fresh-clone walkthrough (Linux / macOS)
+## Fresh-clone walkthrough
 
 ```bash
 terramate generate                       # codegen into every leaf
@@ -65,8 +62,7 @@ tofu init -input=false
 tofu plan -input=false                    # random_pet to add
 ```
 
-> **Windows (PowerShell):** refresh PATH first — see the workspace-root
-> `README.md`. No environment variables are needed to drive a leaf.
+No environment variables are needed to drive a leaf.
 
 ## License
 
