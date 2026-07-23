@@ -1,4 +1,4 @@
-name: drift
+name: shipmate · drift
 on:
   schedule:
     - cron: "17 3 * * *"   # nightly, off-peak
@@ -33,7 +33,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    name: drift / ${{ matrix.environment }} / ${{ matrix.stack }}
+    name: ${{ matrix.stack }} / ${{ matrix.environment }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { fetch-depth: 0 }

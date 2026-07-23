@@ -1,4 +1,4 @@
-name: plan
+name: shipmate · plan
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -43,7 +43,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.detect.outputs.matrix) }}
     environment: ${{ matrix.environment }}
-    name: plan / ${{ matrix.environment }} / ${{ matrix.stack }}
+    name: ${{ matrix.stack }} / ${{ matrix.environment }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { fetch-depth: 0 }
