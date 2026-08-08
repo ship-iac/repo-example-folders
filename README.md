@@ -23,8 +23,8 @@ envs/
     app/             # env/dev-eu, after /envs/dev-eu/eu-west-1/platform
   dev-us/us-east-1/
     dns/             # env/dev-us, standalone
-root.tm.hcl          # codegen (local backend, providers, main) + plan/apply scripts
-terramate.tm.hcl     # experiments = ["scripts"]
+root.tm.hcl          # codegen (local backend, providers, main)
+terramate.tm.hcl     # project root marker
 ```
 
 So the corresponding GitHub Environments inject **no** `TF_VAR_*` /
