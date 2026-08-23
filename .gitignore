@@ -3,3 +3,4 @@
 *.tfstate*
 *.otplan
 fingerprint.txt
+planned-head.txt
