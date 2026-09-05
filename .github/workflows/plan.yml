@@ -3,10 +3,6 @@ on:
   pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: Pull request number to plan
-        required: true
 concurrency:
   # `github.event.inputs` is readable under either trigger, unlike the
   # `inputs` context.
