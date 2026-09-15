@@ -1,7 +1,0 @@
-# Folder-per-environment: each environment is its own directory, so no identity
-# variable is injected and the layout derives nothing. A table declaring only
-# `layout` is complete -- `environments` entries exist to carry a region or a
-# cloud role, and this repository needs neither.
-globals "shipmate" {
-  layout = "folder"
-}
