@@ -8,4 +8,4 @@ layout = "folder"
 # team: the engine reads this file and no repository variable.
 [gate]
 approvers_team = "deployers"
-ungated_envs = ["dev eu"]
+ungated_envs = ["dev-eu-apply"]
