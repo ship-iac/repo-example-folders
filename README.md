@@ -67,3 +67,5 @@ No environment variables are needed to drive a leaf.
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
+
+<!-- gate smoke 2026-09-19: proves the comment path resolves the team from the file. -->
