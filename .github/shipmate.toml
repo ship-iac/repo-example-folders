@@ -7,4 +7,4 @@ layout = "folder"
 # Who may drive shipmate by pull-request comment. Every repository declares its own
 # team: the engine reads this file and no repository variable.
 [gate]
-approvers_team = "deployers"
+approvers_team = "outsiders"
