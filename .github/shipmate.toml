@@ -8,3 +8,4 @@ layout = "folder"
 # team: the engine reads this file and no repository variable.
 [gate]
 approvers_team = "deployers"
+approvers = "deployers"
