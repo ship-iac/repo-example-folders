@@ -6,8 +6,17 @@ environment × region × component, each owning its own hardcoded state. Null
 resources only, local backend, **zero cloud credentials**.
 
 The engine and its three workflows (`plan.yml` / `deploy.yml` / `drift.yml`)
-are identical to the other sample repos — only the env model differs. That's
-the point: the same actions drive all three layouts.
+are identical to the other local-backend sample repos — only the env model
+differs. That's the point: the same actions drive all three layouts.
+
+The engine's reusable workflows are referenced at `@main`: every run here
+(plan, deploy, drift, comment-driven apply and unlock) executes the engine's
+current default branch, so this sample has no engine pin to bump. Expect
+`shipmate doctor` to annotate every run with one WARNING per `uses:` line
+saying the ref is a branch, and a plan comment on every pull request because
+of it. The warning is for consumers holding deploy credentials; this sample
+has no cloud credentials. `repo-example-stacks-aws` is the release-pinned
+sample.
 
 ## Environment model: the path *is* the environment
 
