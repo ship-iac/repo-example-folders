@@ -1,10 +1,17 @@
 # Folder-per-environment: each environment is its own directory, so no identity
 # variable is injected and the layout derives nothing. A table declaring only
-# `layout` is complete -- `environments` entries exist to carry a region or a
-# cloud role, and this repository needs neither.
+# `layout` is complete -- `environments` entries exist to carry a region, a
+# cloud role or `shared`.
 layout = "folder"
 
 # Who may drive shipmate by pull-request comment. Every repository declares its own
 # team: the engine reads this file and no repository variable.
 [gate]
 approvers_team = "deployers"
+
+# Both environments bind one bare GitHub Environment on the plan and apply paths.
+[environments.dev-eu]
+shared = true
+
+[environments.dev-us]
+shared = true
