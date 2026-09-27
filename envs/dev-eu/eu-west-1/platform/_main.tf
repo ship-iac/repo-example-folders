@@ -2,7 +2,7 @@
 
 resource "random_pet" "this" {
   keepers = {
-    version = "6"
+    version = "7"
   }
 }
 output "name" {
