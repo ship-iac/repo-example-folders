@@ -1,0 +1,12 @@
+# Folder-per-environment: each environment is its own directory, so no identity
+# variable is injected and the layout derives nothing. A file declaring only
+# `layout` is complete -- `environments` entries exist to carry a region, a
+# cloud role or `shared`.
+layout: folder
+
+# Both environments bind one bare GitHub Environment on the plan and apply paths.
+environments:
+  dev-eu:
+    shared: true
+  dev-us:
+    shared: true
