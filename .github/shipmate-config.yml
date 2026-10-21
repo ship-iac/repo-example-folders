@@ -10,3 +10,6 @@ environments:
     shared: true
   dev-us:
     shared: true
+
+# Ends each plan comment that changes a stack with the shipmate commands.
+command_hints: true
