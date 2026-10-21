@@ -56,7 +56,7 @@ waves exactly as in the other layouts.
 ## Toolchain
 
 - Terramate 0.17.1
-- OpenTofu 1.12.4
+- OpenTofu 1.13.1
 
 ## Fresh-clone walkthrough
 
