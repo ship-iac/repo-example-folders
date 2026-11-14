@@ -1,0 +1,133 @@
+name: probe-g4-skel
+on:
+  workflow_dispatch:
+    inputs:
+      skip_cell: { type: boolean, default: false }
+      fail_cell: { type: string, default: '' }
+      sleep_cell: { type: string, default: '' }
+      fail_save: { type: string, default: '' }
+      plan_if: { type: boolean, default: false }
+permissions: {}
+jobs:
+  cell:
+    if: ${{ !inputs.skip_cell }}
+    runs-on: ubuntu-26.04-arm
+    timeout-minutes: 25
+    permissions: { contents: read }
+    strategy:
+      fail-fast: false
+      matrix:
+        cell: [a, b, c]
+    env:
+      CELL: ${{ matrix.cell }}
+      STATE_PATH: stacks/${{ matrix.cell }}/.state/dev/terraform.tfstate
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Write state
+        if: matrix.cell != 'c'
+        run: |
+          mkdir -p "$(dirname "$STATE_PATH")"
+          printf '{"cell":"%s","run":"%s-%s"}' "$CELL" "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" > "$STATE_PATH"
+      - name: Apply
+        env:
+          FAIL: ${{ inputs.fail_cell == matrix.cell && github.run_attempt == '1' }}
+          SLEEP: ${{ inputs.sleep_cell == matrix.cell }}
+        run: |
+          if [ "$SLEEP" = true ]; then echo "sleeping"; sleep 1200; fi
+          if [ "$FAIL" = true ]; then echo "failing"; exit 1; fi
+      - name: Encrypt
+        id: enc
+        if: always() && matrix.cell != 'c'
+        run: |
+          openssl enc -aes-256-cbc -pbkdf2 -salt -pass pass:probe -in "$STATE_PATH" -out state.enc
+          echo "file=state.enc" >> "$GITHUB_OUTPUT"
+      - name: Inline digest for comparison
+        if: always()
+        run: |
+          echo "shipmate-inline-literal=constant"
+          if [ -f state.enc ]; then echo "shipmate-inline-digest=$(sha256sum state.enc | cut -c1-64)"; else echo "shipmate-inline-digest=none"; fi
+      - name: Digest
+        if: always()
+        uses: ./.github/probe-g4/digest
+        with:
+          file: ${{ steps.enc.outputs.file }}
+          state-path: ${{ env.STATE_PATH }}
+      - name: Upload ciphertext
+        if: always() && steps.enc.outputs.file != ''
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: state-${{ matrix.cell }}-${{ github.run_attempt }}
+          path: state.enc
+          retention-days: 1
+  read:
+    needs: cell
+    if: always() && needs.cell.result != 'skipped'
+    runs-on: ubuntu-slim
+    timeout-minutes: 10
+    permissions: { actions: read, contents: read }
+    outputs:
+      cells: ${{ steps.read.outputs.cells }}
+      none: ${{ steps.read.outputs.none }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: read
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: python3 -u .github/probe-g4/read.py
+  save:
+    name: save (${{ matrix.cell }})
+    needs: read
+    if: always() && needs.read.result == 'success' && needs.read.outputs.cells != '[]'
+    runs-on: ubuntu-26.04-arm
+    timeout-minutes: 10
+    permissions: {}
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.read.outputs.cells) }}
+    steps:
+      - name: Inject failure
+        if: inputs.fail_save == matrix.cell && github.run_attempt == '1'
+        run: exit 1
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: state-${{ matrix.cell }}-${{ matrix.attempt }}
+          path: dl
+      - name: Place ciphertext at the cell path
+        env:
+          DIGEST: ${{ matrix.digest }}
+          STATE_PATH: ${{ matrix.path }}
+        run: |
+          echo "$DIGEST  dl/state.enc" | sha256sum -c -
+          mkdir -p "$(dirname "$STATE_PATH")"
+          cp dl/state.enc "$STATE_PATH"
+      - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ matrix.path }}
+          key: state/probe-g4-${{ matrix.cell }}/dev/${{ github.run_id }}-${{ matrix.attempt }}
+      - id: look
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ matrix.path }}
+          key: state/probe-g4-${{ matrix.cell }}/dev/${{ github.run_id }}-${{ matrix.attempt }}
+          lookup-only: true
+      - env:
+          HIT: ${{ steps.look.outputs.cache-hit }}
+          MATCHED: ${{ steps.look.outputs.cache-matched-key }}
+        run: |
+          echo "cache-hit=$HIT matched=$MATCHED"
+          [ "$HIT" = true ]
+  save-planif:
+    name: save-planif (${{ matrix.cell }})
+    needs: read
+    if: always() && inputs.plan_if && needs.read.outputs.cells != '[]'
+    runs-on: ubuntu-slim
+    permissions: {}
+    strategy:
+      matrix:
+        include: ${{ fromJSON(needs.read.outputs.cells) }}
+    steps:
+      - run: echo "leg ${{ matrix.cell }}"
