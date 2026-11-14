@@ -1,0 +1,19 @@
+name: probe-g3-out
+# Temporary: what a called workflow's outputs carry (job results and outputs) on success,
+# on a cancel while the call waits in its queue group, and on a cancel mid-run. Removed after.
+on:
+  workflow_dispatch:
+    inputs:
+      hold: { required: false, default: '5' }
+permissions: {}
+jobs:
+  call:
+    uses: ./.github/workflows/probe-g3-out-inner.yml
+    with:
+      hold: ${{ inputs.hold }}
+  after:
+    needs: call
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo "call=${{ needs.call.result }} a_result=[${{ needs.call.outputs.a_result }}] a_out=[${{ needs.call.outputs.a_out }}] b_result=[${{ needs.call.outputs.b_result }}]"
