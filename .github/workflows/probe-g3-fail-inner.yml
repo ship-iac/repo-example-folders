@@ -1,0 +1,27 @@
+name: probe-g3-fail-inner
+on:
+  workflow_call:
+    outputs:
+      a_result: { value: "${{ jobs.a.result }}" }
+      a_out: { value: "${{ jobs.a.outputs.x }}" }
+      b_result: { value: "${{ jobs.b.result }}" }
+concurrency:
+  group: probe-g3-fail
+  cancel-in-progress: false
+  queue: max
+permissions: {}
+jobs:
+  a:
+    runs-on: ubuntu-slim
+    outputs:
+      x: ${{ steps.s.outputs.x }}
+    steps:
+      - id: s
+        run: |
+          echo "x=true" >> "$GITHUB_OUTPUT"
+          exit 1
+  b:
+    needs: a
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo unreachable

@@ -1,0 +1,14 @@
+name: probe-g3-fail
+# Temporary: what a called workflow's outputs carry when the call ends in failure. Removed after.
+on:
+  workflow_dispatch:
+permissions: {}
+jobs:
+  call:
+    uses: ./.github/workflows/probe-g3-fail-inner.yml
+  after:
+    needs: call
+    if: always()
+    runs-on: ubuntu-slim
+    steps:
+      - run: echo "call=${{ needs.call.result }} a_result=[${{ needs.call.outputs.a_result }}] a_out=[${{ needs.call.outputs.a_out }}] b_result=[${{ needs.call.outputs.b_result }}]"
